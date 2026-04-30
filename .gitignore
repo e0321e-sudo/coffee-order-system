@@ -1,0 +1,21 @@
+# Gradle
+.gradle/
+build/
+
+# IntelliJ
+.idea/
+*.iml
+*.iws
+
+# Mac
+.DS_Store
+
+# Log
+*.log
+
+# Spring Boot
+target/
+
+# 환경변수
+.env
+application-secret.yml
