@@ -19,3 +19,14 @@ target/
 # 환경변수
 .env
 application-secret.yml
+
+# Redis/Kafka Data
+dump.rdb
+/data/
+
+# 추가적인 IntelliJ 설정
+out/
+.gen/
+
+# OS 관련
+Thumbs.db
