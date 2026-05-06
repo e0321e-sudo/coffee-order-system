@@ -24,6 +24,9 @@ public class Admin {
     @Column(name = "password", nullable = false)
     private String password;
 
+    @Column(name = "refresh_token")
+    private String refreshToken;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -32,5 +35,9 @@ public class Admin {
         this.email = email;
         this.password = password;
         this.createdAt = LocalDateTime.now();
+    }
+
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 }
