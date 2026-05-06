@@ -8,10 +8,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 /** 주문 엔티티 — 상태 전이 및 취소 가능 여부 검증 */
 @Entity
-@Table(name = "orders")
+@Table(
+    name = "orders",
+    uniqueConstraints = @UniqueConstraint(
+        name = "uq_order_user_menu_kiosk_second",
+        columnNames = {"user_id", "menu_id", "kiosk_id", "order_second"}
+    )
+)
 @Getter
 @NoArgsConstructor
 public class Order {
@@ -44,6 +51,9 @@ public class Order {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "order_second", nullable = false, updatable = false)
+    private LocalDateTime orderSecond;
+
     @Column(name = "cancelled_at")
     private LocalDateTime cancelledAt;
 
@@ -56,6 +66,7 @@ public class Order {
         this.totalPrice = totalPrice;
         this.status = OrderStatus.PENDING;
         this.createdAt = LocalDateTime.now();
+        this.orderSecond = this.createdAt.truncatedTo(ChronoUnit.SECONDS);
     }
 
     /** 주문 완료 처리 */
