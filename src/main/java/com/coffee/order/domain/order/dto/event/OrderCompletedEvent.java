@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,5 +17,5 @@ public class OrderCompletedEvent {
     private Long storeId;
     private Long kioskId;
     private int totalPrice;
-    private String createdAt;
+    private LocalDateTime createdAt;
 }

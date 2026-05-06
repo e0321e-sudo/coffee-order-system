@@ -6,10 +6,12 @@ import com.coffee.order.domain.menu.entity.Menu;
 import com.coffee.order.domain.menu.entity.MenuStock;
 import com.coffee.order.domain.menu.repository.MenuRepository;
 import com.coffee.order.domain.menu.repository.MenuStockRepository;
+import com.coffee.order.domain.order.dto.event.OrderCompletedEvent;
 import com.coffee.order.domain.order.dto.request.OrderCreateRequestDto;
 import com.coffee.order.domain.order.dto.response.OrderCancelResponseDto;
 import com.coffee.order.domain.order.dto.response.OrderCreateResponseDto;
 import com.coffee.order.domain.order.entity.Order;
+import com.coffee.order.domain.order.kafka.OrderProducer;
 import com.coffee.order.domain.order.repository.OrderRepository;
 import com.coffee.order.domain.stock.entity.StockHistory;
 import com.coffee.order.domain.stock.entity.StockHistoryType;
@@ -44,6 +46,7 @@ public class OrderService {
     private final StoreRepository storeRepository;
     private final SpecialCloseRepository specialCloseRepository;
     private final StockHistoryRepository stockHistoryRepository;
+    private final OrderProducer orderProducer;
 
     @Transactional
     public OrderCreateResponseDto order(OrderCreateRequestDto request) {
@@ -92,6 +95,18 @@ public class OrderService {
                 .stockAfter(menuStock.getStock())
                 .adminId(null)
                 .build());
+
+        // 8. Kafka 주문 완료 이벤트 발행
+        orderProducer.sendOrderCompleted(new OrderCompletedEvent(
+                savedOrder.getId(),
+                lockedUser.getId(),
+                lockedUser.getPhoneNumber(),
+                menu.getId(),
+                request.getStoreId(),
+                request.getKioskId(),
+                savedOrder.getTotalPrice(),
+                savedOrder.getCreatedAt()
+        ));
 
         return OrderCreateResponseDto.of(savedOrder, menu.getName(), lockedUser.getPoint());
     }
