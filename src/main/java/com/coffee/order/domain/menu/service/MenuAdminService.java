@@ -13,6 +13,8 @@ import com.coffee.order.domain.menu.repository.MenuRepository;
 import com.coffee.order.domain.menu.repository.MenuStockRepository;
 import com.coffee.order.domain.stock.entity.StockHistory;
 import com.coffee.order.domain.stock.entity.StockHistoryType;
+import com.coffee.order.domain.stock.kafka.StockProducer;
+import com.coffee.order.domain.stock.kafka.event.StockRestockedEvent;
 import com.coffee.order.domain.stock.repository.StockHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,7 +33,9 @@ public class MenuAdminService {
     private final CategoryRepository categoryRepository;
     private final MenuStockRepository menuStockRepository;
     private final StockHistoryRepository stockHistoryRepository;
+    private final StockProducer stockProducer;
 
+    // 메뉴 등록 - 카테고리 검증 후 메뉴 생성
     @Transactional
     public MenuResponseDto create(MenuAdminRequestDto request) {
         Menu menu = Menu.builder()
@@ -46,6 +50,7 @@ public class MenuAdminService {
         return new MenuResponseDto(menu.getId(), menu.getName(), menu.getPrice(), categoryName, false);
     }
 
+    // 전체 메뉴 조회 - 노출 중인 메뉴만 반환, 카테고리명 함께 조회
     @Transactional(readOnly = true)
     public List<MenuResponseDto> findAll() {
         List<Menu> menus = menuRepository.findAllByIsVisibleTrue();
@@ -59,6 +64,7 @@ public class MenuAdminService {
                 .toList();
     }
 
+    // 메뉴 수정 - 카테고리, 이름, 가격 변경
     @Transactional
     public MenuResponseDto update(Long id, MenuAdminRequestDto request) {
         Menu menu = getMenu(id);
@@ -68,6 +74,7 @@ public class MenuAdminService {
         return new MenuResponseDto(menu.getId(), menu.getName(), menu.getPrice(), categoryName, false);
     }
 
+    // 메뉴 숨김 처리 - isVisible = false
     @Transactional
     public MenuResponseDto hide(Long id) {
         Menu menu = getMenu(id);
@@ -77,9 +84,10 @@ public class MenuAdminService {
         return new MenuResponseDto(menu.getId(), menu.getName(), menu.getPrice(), categoryName, false);
     }
 
+    // 재고 추가 - 비관적 락으로 재고 증가 후 이력 기록
     @Transactional
     public void addStock(Long menuId, StockAddRequestDto request) {
-        getMenu(menuId);
+        Menu menu = getMenu(menuId);
         MenuStock stock = menuStockRepository
                 .findByStoreIdAndMenuIdWithLock(request.getStoreId(), menuId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.STOCK_NOT_FOUND));
@@ -94,6 +102,15 @@ public class MenuAdminService {
                 .stockAfter(stock.getStock())
                 .adminId(null)
                 .build());
+
+        // 재입고 완료 시 Kafka stock-restocked 이벤트 발행
+        stockProducer.sendStockRestocked(new StockRestockedEvent(
+                request.getStoreId(),
+                menuId,
+                menu.getName(),
+                stock.getStock(),
+                request.getAmount()
+        ));
     }
 
     private Menu getMenu(Long id) {

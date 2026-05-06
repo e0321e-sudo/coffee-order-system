@@ -15,6 +15,8 @@ import com.coffee.order.domain.order.kafka.OrderProducer;
 import com.coffee.order.domain.order.repository.OrderRepository;
 import com.coffee.order.domain.stock.entity.StockHistory;
 import com.coffee.order.domain.stock.entity.StockHistoryType;
+import com.coffee.order.domain.stock.kafka.StockProducer;
+import com.coffee.order.domain.stock.kafka.event.StockAlertEvent;
 import com.coffee.order.domain.stock.repository.StockHistoryRepository;
 import com.coffee.order.domain.store.entity.SpecialClose;
 import com.coffee.order.domain.store.entity.Store;
@@ -47,6 +49,7 @@ public class OrderService {
     private final SpecialCloseRepository specialCloseRepository;
     private final StockHistoryRepository stockHistoryRepository;
     private final OrderProducer orderProducer;
+    private final StockProducer stockProducer;
 
     @Transactional
     public OrderCreateResponseDto order(OrderCreateRequestDto request) {
@@ -79,6 +82,16 @@ public class OrderService {
         // 5. 재고 차감
         int stockBefore = menuStock.getStock();
         menuStock.decreaseStock();
+
+        // 재고 10개 이하 감지 시 stock-alert 발행
+        if (menuStock.getStock() <= MenuStock.LOW_STOCK_THRESHOLD) {
+            stockProducer.sendStockAlert(new StockAlertEvent(
+                    request.getStoreId(),
+                    menu.getId(),
+                    menu.getName(),
+                    menuStock.getStock()
+            ));
+        }
 
         // 6. 주문 생성 (COMPLETED)
         Order savedOrder = orderRepository.save(
