@@ -1,5 +1,6 @@
 package com.coffee.order.common.config;
 
+import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -9,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
+import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.*;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
@@ -16,14 +18,13 @@ import org.springframework.kafka.support.serializer.JsonSerializer;
 import java.util.HashMap;
 import java.util.Map;
 
-@EnableKafka        // @KafkaListener 어노테이션 활성화
+@EnableKafka
 @Configuration
 public class KafkaConfig {
 
     // application.yml의 bootstrap-servers 값 주입
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
-
 
     // Producer 설정
     @Bean
@@ -72,5 +73,37 @@ public class KafkaConfig {
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
         return factory;
+    }
+
+
+    // Topic 설정
+    // 서버 시작 시 자동으로 토픽 생성
+    // partitions(3) = 브로커 3개에 맞게 파티션 3개
+    // replicas(3)   = 브로커 3개에 복제본 저장 (1개 죽어도 데이터 안 날아감)
+    @Bean
+    public NewTopic orderCompletedTopic() {
+        // 주문 완료 이벤트 토픽 — 주문 시 발행, 데이터 수집 플랫폼으로 전송
+        return TopicBuilder.name("order-completed")
+                .partitions(3)
+                .replicas(3)
+                .build();
+    }
+
+    @Bean
+    public NewTopic stockAlertTopic() {
+        // 재고 부족 알림 토픽 — 재고 10개 이하 감지 시 발행, 백오피스 SSE 알림
+        return TopicBuilder.name("stock-alert")
+                .partitions(3)
+                .replicas(3)
+                .build();
+    }
+
+    @Bean
+    public NewTopic stockRestockedTopic() {
+        // 재입고 알림 토픽 — 관리자 재입고 시 발행, Redis 캐시 무효화 + 백오피스 SSE 알림
+        return TopicBuilder.name("stock-restocked")
+                .partitions(3)
+                .replicas(3)
+                .build();
     }
 }
