@@ -95,10 +95,24 @@ services:
     networks:
       - kafka-net
 
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: coffee_order_db
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - kafka-net
+
 volumes:
   kafka1_data:
   kafka2_data:
   kafka3_data:
+  mysql_data:
 
 networks:
   kafka-net:
