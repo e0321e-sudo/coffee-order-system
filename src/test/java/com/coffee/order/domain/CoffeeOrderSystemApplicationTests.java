@@ -1,4 +1,4 @@
-package com.sparta.coffee;
+package com.coffee.order.domain;
 
 import com.coffee.order.CoffeeOrderSystemApplication;
 import org.junit.jupiter.api.Test;

@@ -20,7 +20,7 @@ class UserTest {
     @BeforeEach
     void setUp() {
         user = User.builder()
-                .phoneNumber("01012345678")
+                .phoneNumber("010-1234-5678")
                 .point(10000L)
                 .build();
     }
@@ -116,7 +116,7 @@ class UserTest {
     void 포인트_잔액없을때_차감_예외() {
         // given
         User emptyUser = User.builder()
-                .phoneNumber("01099999999")
+                .phoneNumber("010-9999-9999")
                 .point(0L)
                 .build();
 
@@ -132,7 +132,7 @@ class UserTest {
     void 포인트_차감후_잔액_검증() {
         // given
         User richUser = User.builder()
-                .phoneNumber("01055555555")
+                .phoneNumber("010-5555-5555")
                 .point(50000L)
                 .build();
         long deductAmount = 4500L;
@@ -153,7 +153,7 @@ class UserTest {
         int threadCount = 10;
         long deductAmount = 1000L;
         User concurrentUser = User.builder()
-                .phoneNumber("01011111111")
+                .phoneNumber("010-1111-1111")
                 .point(threadCount * deductAmount)
                 .build();
 

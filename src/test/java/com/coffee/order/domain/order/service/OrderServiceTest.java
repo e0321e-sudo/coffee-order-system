@@ -77,7 +77,7 @@ class OrderServiceTest {
 
     @BeforeEach
     void setUp() {
-        request = new OrderCreateRequestDto("01012345678", 1L, 1L, 1L);
+        request = new OrderCreateRequestDto("010-1234-5678", 1L, 1L, 1L);
 
         activeStore = Store.builder()
                 .name("테스트 커피 매장")
@@ -100,7 +100,7 @@ class OrderServiceTest {
                 .build();
 
         user = User.builder()
-                .phoneNumber("01012345678")
+                .phoneNumber("010-1234-5678")
                 .point(10000L)
                 .build();
         ReflectionTestUtils.setField(user, "id", 1L);
@@ -129,7 +129,7 @@ class OrderServiceTest {
             given(specialCloseRepository.findByStoreId(1L)).willReturn(Collections.emptyList());
             given(menuRepository.findByIdAndIsVisibleTrue(1L)).willReturn(Optional.of(menu));
             given(menuStockRepository.findByStoreIdAndMenuIdWithLock(1L, 1L)).willReturn(Optional.of(menuStock));
-            given(userService.findOrCreateUser("01012345678")).willReturn(user);
+            given(userService.findOrCreateUser("010-1234-5678")).willReturn(user);
             given(userRepository.findByIdWithLock(1L)).willReturn(Optional.of(user));
             given(orderRepository.save(any(Order.class))).willReturn(savedOrder);
             given(stockHistoryRepository.save(any())).willReturn(null);
@@ -155,7 +155,7 @@ class OrderServiceTest {
             given(specialCloseRepository.findByStoreId(1L)).willReturn(Collections.emptyList());
             given(menuRepository.findByIdAndIsVisibleTrue(1L)).willReturn(Optional.of(menu));
             given(menuStockRepository.findByStoreIdAndMenuIdWithLock(1L, 1L)).willReturn(Optional.of(menuStock));
-            given(userService.findOrCreateUser("01012345678")).willReturn(user);
+            given(userService.findOrCreateUser("010-1234-5678")).willReturn(user);
             given(userRepository.findByIdWithLock(1L)).willReturn(Optional.of(user));
             given(orderRepository.save(any(Order.class))).willReturn(savedOrder);
             given(stockHistoryRepository.save(any())).willReturn(null);
@@ -179,7 +179,7 @@ class OrderServiceTest {
             given(specialCloseRepository.findByStoreId(1L)).willReturn(Collections.emptyList());
             given(menuRepository.findByIdAndIsVisibleTrue(1L)).willReturn(Optional.of(menu));
             given(menuStockRepository.findByStoreIdAndMenuIdWithLock(1L, 1L)).willReturn(Optional.of(menuStock));
-            given(userService.findOrCreateUser("01012345678")).willReturn(user);
+            given(userService.findOrCreateUser("010-1234-5678")).willReturn(user);
             given(userRepository.findByIdWithLock(1L)).willReturn(Optional.of(user));
             given(orderRepository.save(any(Order.class))).willReturn(savedOrder);
             given(stockHistoryRepository.save(any())).willReturn(null);
@@ -203,7 +203,7 @@ class OrderServiceTest {
             given(specialCloseRepository.findByStoreId(1L)).willReturn(Collections.emptyList());
             given(menuRepository.findByIdAndIsVisibleTrue(1L)).willReturn(Optional.of(menu));
             given(menuStockRepository.findByStoreIdAndMenuIdWithLock(1L, 1L)).willReturn(Optional.of(menuStock));
-            given(userService.findOrCreateUser("01012345678")).willReturn(user);
+            given(userService.findOrCreateUser("010-1234-5678")).willReturn(user);
             given(userRepository.findByIdWithLock(1L)).willReturn(Optional.of(user));
             given(orderRepository.save(any(Order.class))).willReturn(savedOrder);
             given(stockHistoryRepository.save(any())).willReturn(null);
@@ -227,7 +227,7 @@ class OrderServiceTest {
             given(specialCloseRepository.findByStoreId(1L)).willReturn(Collections.emptyList());
             given(menuRepository.findByIdAndIsVisibleTrue(1L)).willReturn(Optional.of(menu));
             given(menuStockRepository.findByStoreIdAndMenuIdWithLock(1L, 1L)).willReturn(Optional.of(menuStock));
-            given(userService.findOrCreateUser("01012345678")).willReturn(user);
+            given(userService.findOrCreateUser("010-1234-5678")).willReturn(user);
             given(userRepository.findByIdWithLock(1L)).willReturn(Optional.of(user));
             given(orderRepository.save(any(Order.class))).willReturn(savedOrder);
             given(stockHistoryRepository.save(any())).willReturn(null);
@@ -298,7 +298,7 @@ class OrderServiceTest {
             given(specialCloseRepository.findByStoreId(1L)).willReturn(Collections.emptyList());
             given(menuRepository.findByIdAndIsVisibleTrue(1L)).willReturn(Optional.of(menu));
             given(menuStockRepository.findByStoreIdAndMenuIdWithLock(1L, 1L)).willReturn(Optional.of(menuStock));
-            given(userService.findOrCreateUser("01012345678")).willReturn(user);
+            given(userService.findOrCreateUser("010-1234-5678")).willReturn(user);
             given(userRepository.findByIdWithLock(1L)).willReturn(Optional.of(user));
             given(orderRepository.save(any(Order.class))).willReturn(savedOrder);
             given(stockHistoryRepository.save(any())).willReturn(null);
@@ -319,7 +319,7 @@ class OrderServiceTest {
             given(specialCloseRepository.findByStoreId(1L)).willReturn(Collections.emptyList());
             given(menuRepository.findByIdAndIsVisibleTrue(1L)).willReturn(Optional.of(menu));
             given(menuStockRepository.findByStoreIdAndMenuIdWithLock(1L, 1L)).willReturn(Optional.of(menuStock));
-            given(userService.findOrCreateUser("01012345678")).willReturn(user);
+            given(userService.findOrCreateUser("010-1234-5678")).willReturn(user);
             given(userRepository.findByIdWithLock(1L)).willReturn(Optional.of(user));
             given(orderRepository.save(any(Order.class))).willReturn(savedOrder);
             given(stockHistoryRepository.save(any())).willReturn(null);
@@ -409,7 +409,7 @@ class OrderServiceTest {
             given(specialCloseRepository.findByStoreId(1L)).willReturn(List.of(tomorrowClose));
             given(menuRepository.findByIdAndIsVisibleTrue(1L)).willReturn(Optional.of(menu));
             given(menuStockRepository.findByStoreIdAndMenuIdWithLock(1L, 1L)).willReturn(Optional.of(menuStock));
-            given(userService.findOrCreateUser("01012345678")).willReturn(user);
+            given(userService.findOrCreateUser("010-1234-5678")).willReturn(user);
             given(userRepository.findByIdWithLock(1L)).willReturn(Optional.of(user));
             given(orderRepository.save(any(Order.class))).willReturn(savedOrder);
             given(stockHistoryRepository.save(any())).willReturn(null);
@@ -495,7 +495,7 @@ class OrderServiceTest {
             mockedTime.when(LocalTime::now).thenReturn(TIME_10AM);
 
             User poorUser = User.builder()
-                    .phoneNumber("01012345678")
+                    .phoneNumber("010-1234-5678")
                     .point(1000L)
                     .build();
             ReflectionTestUtils.setField(poorUser, "id", 1L);
@@ -504,7 +504,7 @@ class OrderServiceTest {
             given(specialCloseRepository.findByStoreId(1L)).willReturn(Collections.emptyList());
             given(menuRepository.findByIdAndIsVisibleTrue(1L)).willReturn(Optional.of(menu));
             given(menuStockRepository.findByStoreIdAndMenuIdWithLock(1L, 1L)).willReturn(Optional.of(menuStock));
-            given(userService.findOrCreateUser("01012345678")).willReturn(poorUser);
+            given(userService.findOrCreateUser("010-1234-5678")).willReturn(poorUser);
             given(userRepository.findByIdWithLock(1L)).willReturn(Optional.of(poorUser));
 
             // when & then
@@ -523,7 +523,7 @@ class OrderServiceTest {
             mockedTime.when(LocalTime::now).thenReturn(TIME_10AM);
 
             User almostUser = User.builder()
-                    .phoneNumber("01012345678")
+                    .phoneNumber("010-1234-5678")
                     .point(4499L)
                     .build();
             ReflectionTestUtils.setField(almostUser, "id", 1L);
@@ -532,7 +532,7 @@ class OrderServiceTest {
             given(specialCloseRepository.findByStoreId(1L)).willReturn(Collections.emptyList());
             given(menuRepository.findByIdAndIsVisibleTrue(1L)).willReturn(Optional.of(menu));
             given(menuStockRepository.findByStoreIdAndMenuIdWithLock(1L, 1L)).willReturn(Optional.of(menuStock));
-            given(userService.findOrCreateUser("01012345678")).willReturn(almostUser);
+            given(userService.findOrCreateUser("010-1234-5678")).willReturn(almostUser);
             given(userRepository.findByIdWithLock(1L)).willReturn(Optional.of(almostUser));
 
             // when & then
@@ -551,7 +551,7 @@ class OrderServiceTest {
             mockedTime.when(LocalTime::now).thenReturn(TIME_10AM);
 
             User exactUser = User.builder()
-                    .phoneNumber("01012345678")
+                    .phoneNumber("010-1234-5678")
                     .point(4500L)
                     .build();
             ReflectionTestUtils.setField(exactUser, "id", 1L);
@@ -560,7 +560,7 @@ class OrderServiceTest {
             given(specialCloseRepository.findByStoreId(1L)).willReturn(Collections.emptyList());
             given(menuRepository.findByIdAndIsVisibleTrue(1L)).willReturn(Optional.of(menu));
             given(menuStockRepository.findByStoreIdAndMenuIdWithLock(1L, 1L)).willReturn(Optional.of(menuStock));
-            given(userService.findOrCreateUser("01012345678")).willReturn(exactUser);
+            given(userService.findOrCreateUser("010-1234-5678")).willReturn(exactUser);
             given(userRepository.findByIdWithLock(1L)).willReturn(Optional.of(exactUser));
             given(orderRepository.save(any(Order.class))).willReturn(savedOrder);
             given(stockHistoryRepository.save(any())).willReturn(null);
@@ -591,7 +591,7 @@ class OrderServiceTest {
             given(specialCloseRepository.findByStoreId(1L)).willReturn(Collections.emptyList());
             given(menuRepository.findByIdAndIsVisibleTrue(1L)).willReturn(Optional.of(menu));
             given(menuStockRepository.findByStoreIdAndMenuIdWithLock(1L, 1L)).willReturn(Optional.of(lowStock));
-            given(userService.findOrCreateUser("01012345678")).willReturn(user);
+            given(userService.findOrCreateUser("010-1234-5678")).willReturn(user);
             given(userRepository.findByIdWithLock(1L)).willReturn(Optional.of(user));
             given(orderRepository.save(any(Order.class))).willReturn(savedOrder);
             given(stockHistoryRepository.save(any())).willReturn(null);
@@ -620,7 +620,7 @@ class OrderServiceTest {
             given(specialCloseRepository.findByStoreId(1L)).willReturn(Collections.emptyList());
             given(menuRepository.findByIdAndIsVisibleTrue(1L)).willReturn(Optional.of(menu));
             given(menuStockRepository.findByStoreIdAndMenuIdWithLock(1L, 1L)).willReturn(Optional.of(sufficientStock));
-            given(userService.findOrCreateUser("01012345678")).willReturn(user);
+            given(userService.findOrCreateUser("010-1234-5678")).willReturn(user);
             given(userRepository.findByIdWithLock(1L)).willReturn(Optional.of(user));
             given(orderRepository.save(any(Order.class))).willReturn(savedOrder);
             given(stockHistoryRepository.save(any())).willReturn(null);
@@ -649,14 +649,14 @@ class OrderServiceTest {
         order.complete();
         ReflectionTestUtils.setField(order, "id", 100L);
 
-        given(userRepository.findByPhoneNumber("01012345678")).willReturn(Optional.of(user));
+        given(userRepository.findByPhoneNumber("010-1234-5678")).willReturn(Optional.of(user));
         given(orderRepository.findByIdAndUserId(100L, 1L)).willReturn(Optional.of(order));
         given(userRepository.findByIdWithLock(1L)).willReturn(Optional.of(user));
         given(menuStockRepository.findByStoreIdAndMenuIdWithLock(1L, 1L)).willReturn(Optional.of(menuStock));
         given(stockHistoryRepository.save(any())).willReturn(null);
 
         // when
-        OrderCancelResponseDto response = orderService.cancel(100L, "01012345678");
+        OrderCancelResponseDto response = orderService.cancel(100L, "010-1234-5678");
 
         // then
         assertThat(response.status()).isEqualTo(OrderStatus.CANCELLED);
@@ -678,19 +678,19 @@ class OrderServiceTest {
         ReflectionTestUtils.setField(order, "id", 100L);
 
         User lockedUser = User.builder()
-                .phoneNumber("01012345678")
+                .phoneNumber("010-1234-5678")
                 .point(5500L)
                 .build();
         ReflectionTestUtils.setField(lockedUser, "id", 1L);
 
-        given(userRepository.findByPhoneNumber("01012345678")).willReturn(Optional.of(user));
+        given(userRepository.findByPhoneNumber("010-1234-5678")).willReturn(Optional.of(user));
         given(orderRepository.findByIdAndUserId(100L, 1L)).willReturn(Optional.of(order));
         given(userRepository.findByIdWithLock(1L)).willReturn(Optional.of(lockedUser));
         given(menuStockRepository.findByStoreIdAndMenuIdWithLock(1L, 1L)).willReturn(Optional.of(menuStock));
         given(stockHistoryRepository.save(any())).willReturn(null);
 
         // when
-        orderService.cancel(100L, "01012345678");
+        orderService.cancel(100L, "010-1234-5678");
 
         // then: 5500 + 4500 = 10000
         assertThat(lockedUser.getPoint()).isEqualTo(10000L);
@@ -716,14 +716,14 @@ class OrderServiceTest {
         order.complete();
         ReflectionTestUtils.setField(order, "id", 100L);
 
-        given(userRepository.findByPhoneNumber("01012345678")).willReturn(Optional.of(user));
+        given(userRepository.findByPhoneNumber("010-1234-5678")).willReturn(Optional.of(user));
         given(orderRepository.findByIdAndUserId(100L, 1L)).willReturn(Optional.of(order));
         given(userRepository.findByIdWithLock(1L)).willReturn(Optional.of(user));
         given(menuStockRepository.findByStoreIdAndMenuIdWithLock(1L, 1L)).willReturn(Optional.of(depleted));
         given(stockHistoryRepository.save(any())).willReturn(null);
 
         // when
-        orderService.cancel(100L, "01012345678");
+        orderService.cancel(100L, "010-1234-5678");
 
         // then: 9 + 1 = 10
         assertThat(depleted.getStock()).isEqualTo(10);
@@ -743,14 +743,14 @@ class OrderServiceTest {
         order.complete();
         ReflectionTestUtils.setField(order, "id", 100L);
 
-        given(userRepository.findByPhoneNumber("01012345678")).willReturn(Optional.of(user));
+        given(userRepository.findByPhoneNumber("010-1234-5678")).willReturn(Optional.of(user));
         given(orderRepository.findByIdAndUserId(100L, 1L)).willReturn(Optional.of(order));
         given(userRepository.findByIdWithLock(1L)).willReturn(Optional.of(user));
         given(menuStockRepository.findByStoreIdAndMenuIdWithLock(1L, 1L)).willReturn(Optional.of(menuStock));
         given(stockHistoryRepository.save(any())).willReturn(null);
 
         // when
-        orderService.cancel(100L, "01012345678");
+        orderService.cancel(100L, "010-1234-5678");
 
         // then
         then(stockHistoryRepository).should(times(1)).save(any());
@@ -762,10 +762,10 @@ class OrderServiceTest {
     @DisplayName("취소 - 존재하지 않는 사용자 USER_NOT_FOUND 예외")
     void 취소_사용자없음_예외() {
         // given
-        given(userRepository.findByPhoneNumber("01099999999")).willReturn(Optional.empty());
+        given(userRepository.findByPhoneNumber("010-9999-9999")).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> orderService.cancel(100L, "01099999999"))
+        assertThatThrownBy(() -> orderService.cancel(100L, "010-9999-9999"))
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .isEqualTo(ErrorCode.USER_NOT_FOUND);
@@ -775,11 +775,11 @@ class OrderServiceTest {
     @DisplayName("취소 - 다른 사용자의 주문 ORDER_NOT_FOUND 예외")
     void 취소_타인주문_예외() {
         // given
-        given(userRepository.findByPhoneNumber("01012345678")).willReturn(Optional.of(user));
+        given(userRepository.findByPhoneNumber("010-1234-5678")).willReturn(Optional.of(user));
         given(orderRepository.findByIdAndUserId(999L, 1L)).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> orderService.cancel(999L, "01012345678"))
+        assertThatThrownBy(() -> orderService.cancel(999L, "010-1234-5678"))
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .isEqualTo(ErrorCode.ORDER_NOT_FOUND);
@@ -789,11 +789,11 @@ class OrderServiceTest {
     @DisplayName("취소 - 존재하지 않는 주문 ORDER_NOT_FOUND 예외")
     void 취소_주문없음_예외() {
         // given
-        given(userRepository.findByPhoneNumber("01012345678")).willReturn(Optional.of(user));
+        given(userRepository.findByPhoneNumber("010-1234-5678")).willReturn(Optional.of(user));
         given(orderRepository.findByIdAndUserId(100L, 1L)).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> orderService.cancel(100L, "01012345678"))
+        assertThatThrownBy(() -> orderService.cancel(100L, "010-1234-5678"))
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .isEqualTo(ErrorCode.ORDER_NOT_FOUND);
@@ -813,11 +813,11 @@ class OrderServiceTest {
         ReflectionTestUtils.setField(expiredOrder, "createdAt",
                 LocalDateTime.now().minusMinutes(10));
 
-        given(userRepository.findByPhoneNumber("01012345678")).willReturn(Optional.of(user));
+        given(userRepository.findByPhoneNumber("010-1234-5678")).willReturn(Optional.of(user));
         given(orderRepository.findByIdAndUserId(100L, 1L)).willReturn(Optional.of(expiredOrder));
 
         // when & then
-        assertThatThrownBy(() -> orderService.cancel(100L, "01012345678"))
+        assertThatThrownBy(() -> orderService.cancel(100L, "010-1234-5678"))
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .isEqualTo(ErrorCode.ORDER_CANCEL_EXPIRED);
@@ -837,11 +837,11 @@ class OrderServiceTest {
         ReflectionTestUtils.setField(borderOrder, "createdAt",
                 LocalDateTime.now().minusMinutes(5).minusSeconds(1));
 
-        given(userRepository.findByPhoneNumber("01012345678")).willReturn(Optional.of(user));
+        given(userRepository.findByPhoneNumber("010-1234-5678")).willReturn(Optional.of(user));
         given(orderRepository.findByIdAndUserId(100L, 1L)).willReturn(Optional.of(borderOrder));
 
         // when & then
-        assertThatThrownBy(() -> orderService.cancel(100L, "01012345678"))
+        assertThatThrownBy(() -> orderService.cancel(100L, "010-1234-5678"))
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .isEqualTo(ErrorCode.ORDER_CANCEL_EXPIRED);
