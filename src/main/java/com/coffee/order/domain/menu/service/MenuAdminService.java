@@ -16,6 +16,7 @@ import com.coffee.order.domain.stock.entity.StockHistoryType;
 import com.coffee.order.domain.stock.kafka.StockProducer;
 import com.coffee.order.domain.stock.kafka.event.StockRestockedEvent;
 import com.coffee.order.domain.stock.repository.StockHistoryRepository;
+import com.coffee.order.domain.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +35,7 @@ public class MenuAdminService {
     private final MenuStockRepository menuStockRepository;
     private final StockHistoryRepository stockHistoryRepository;
     private final StockProducer stockProducer;
+    private final StoreRepository storeRepository;
 
     // 메뉴 등록 - 카테고리 검증 후 메뉴 생성
     @Transactional
@@ -104,8 +106,13 @@ public class MenuAdminService {
                 .build());
 
         // 재입고 완료 시 Kafka stock-restocked 이벤트 발행
+        String storeName = storeRepository.findById(request.getStoreId())
+                        .map(store -> store.getName())
+                                .orElse("알 수 없는 매장");
+
         stockProducer.sendStockRestocked(new StockRestockedEvent(
                 request.getStoreId(),
+                storeName,
                 menuId,
                 menu.getName(),
                 stock.getStock(),

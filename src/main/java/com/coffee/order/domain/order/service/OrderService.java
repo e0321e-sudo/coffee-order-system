@@ -87,6 +87,7 @@ public class OrderService {
         if (menuStock.getStock() <= MenuStock.LOW_STOCK_THRESHOLD) {
             stockProducer.sendStockAlert(new StockAlertEvent(
                     request.getStoreId(),
+                    store.getName(),
                     menu.getId(),
                     menu.getName(),
                     menuStock.getStock()

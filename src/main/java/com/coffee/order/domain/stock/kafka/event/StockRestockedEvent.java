@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class StockRestockedEvent {
     private Long storeId;       // 어느 매장
+    private String storeName;   // 매장 이름
     private Long menuId;        // 어느 메뉴
     private String menuName;    // 메뉴명
     private int currentStock;   // 재입고 후 재고
