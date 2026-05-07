@@ -1,0 +1,22 @@
+[33mc8471a0[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m test: 전화번호 테스트 데이터 하이픈 포함 형식으로 통일
+[33m566788c[m feat: 전화번호 형식 검증(@Pattern) 추가 및 ConstraintViolationException 핸들러 등록
+[33m26ce27e[m test: 핵심 도메인 단위 테스트 및 동시성 테스트 작성
+[33m74109a3[m test: 핵심 도메인 단위 테스트 및 동시성 테스트 작성
+[33m0d7889b[m chore: MySQL 전환 완료
+[33m8f7e297[m feat: DataInitializer로 초기 데이터 자동 생성
+[33m139a1d2[m chore: H2에서 MySQL로 DB 전환
+[33me145e21[m chore: docker-compose에 MySQL 추가
+[33m86cb26d[m chore: data.sql 테스트 데이터 수정 및 임시 로그 제거
+[33m4cee7f0[m feat: SSE 구독 및 재고 부족/재입고 실시간 알림 구현
+[33ma78a7b2[m feat: StockProducer/Consumer 구현 및 재고 부족/재입고 이벤트 연동
+[33m371ca6f[m feat: OrderService에 Kafka 주문 완료 이벤트 발행 연동
+[33m753e680[m feat: Kafka Producer/Consumer 및 주문 완료 이벤트 구현
+[33mf92577f[m feat: KafkaConfig 토픽 자동 생성 추가
+[33m571fd25[m feat: Kafka 설정 추가 (KafkaConfig)
+[33m9fd6e95[m chore: Kafka/Redis 설정 추가 및 JWT 민감정보 분리
+[33m067a9ea[m feat: Order 테이블 중복 주문 방지 Unique 제약 추가
+[33m1d5b840[m feat: 신규 유저 식별 플래그 및 리프레시 토큰 추가
+[33mfdf60e7[m feat: 주문 시스템 레이어드 아키텍처 기반 핵심 로직 구현
+[33m3adace6[m feat: initialize Spring Boot project
+[33me7cce71[m Add .gitignore file for project dependencies and files
+[33mee34021[m Initial commit

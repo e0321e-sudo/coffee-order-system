@@ -74,14 +74,20 @@ public class OrderService {
         menuStock.validateNotSoldOut();
 
         // 4. 비관적 락으로 포인트 차감
+        int quantity = request.getQuantity();
         User user = userService.findOrCreateUser(request.getPhoneNumber());
         User lockedUser = userRepository.findByIdWithLock(user.getId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-        lockedUser.deductPoint(menu.getPrice());
+        lockedUser.deductPoint((long) menu.getPrice() * quantity);
 
         // 5. 재고 차감
+        if (menuStock.getStock() < quantity) {
+            throw new BusinessException(ErrorCode.MENU_SOLD_OUT);
+        }
         int stockBefore = menuStock.getStock();
-        menuStock.decreaseStock();
+        for (int i = 0; i < quantity; i++) {
+            menuStock.decreaseStock();
+        }
 
         // 재고 10개 이하 감지 시 stock-alert 발행
         if (menuStock.getStock() <= MenuStock.LOW_STOCK_THRESHOLD) {
@@ -104,7 +110,7 @@ public class OrderService {
                 .menuId(menu.getId())
                 .storeId(request.getStoreId())
                 .type(StockHistoryType.ORDER_USE)
-                .changedAmount(1)
+                .changedAmount(quantity)
                 .stockBefore(stockBefore)
                 .stockAfter(menuStock.getStock())
                 .adminId(null)
@@ -169,7 +175,7 @@ public class OrderService {
                 .menuId(menu.getId())
                 .storeId(request.getStoreId())
                 .kioskId(request.getKioskId())
-                .totalPrice(menu.getPrice())
+                .totalPrice(menu.getPrice() * request.getQuantity())
                 .build();
         order.complete();
         return order;

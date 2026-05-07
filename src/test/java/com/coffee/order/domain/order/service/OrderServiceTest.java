@@ -77,7 +77,7 @@ class OrderServiceTest {
 
     @BeforeEach
     void setUp() {
-        request = new OrderCreateRequestDto("010-1234-5678", 1L, 1L, 1L);
+        request = new OrderCreateRequestDto("010-1234-5678", 1L, 1L, 1L, 1);
 
         activeStore = Store.builder()
                 .name("테스트 커피 매장")
@@ -845,5 +845,125 @@ class OrderServiceTest {
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .isEqualTo(ErrorCode.ORDER_CANCEL_EXPIRED);
+    }
+
+    // ===== quantity 관련 테스트 =====
+
+    @Test
+    @DisplayName("수량 2개 주문 시 포인트 2배 차감")
+    void 주문_수량2_포인트_2배_차감() {
+        try (MockedStatic<LocalTime> mockedTime = mockStatic(LocalTime.class, CALLS_REAL_METHODS)) {
+            // given: quantity=2, price=4500 → 9000 차감
+            mockedTime.when(LocalTime::now).thenReturn(TIME_10AM);
+
+            OrderCreateRequestDto req2 = new OrderCreateRequestDto("010-1234-5678", 1L, 1L, 1L, 2);
+            Order order9000 = Order.builder()
+                    .userId(1L).menuId(1L).storeId(1L).kioskId(1L).totalPrice(9000).build();
+            order9000.complete();
+            ReflectionTestUtils.setField(order9000, "id", 200L);
+
+            given(storeRepository.findById(1L)).willReturn(Optional.of(activeStore));
+            given(specialCloseRepository.findByStoreId(1L)).willReturn(Collections.emptyList());
+            given(menuRepository.findByIdAndIsVisibleTrue(1L)).willReturn(Optional.of(menu));
+            given(menuStockRepository.findByStoreIdAndMenuIdWithLock(1L, 1L)).willReturn(Optional.of(menuStock));
+            given(userService.findOrCreateUser("010-1234-5678")).willReturn(user);
+            given(userRepository.findByIdWithLock(1L)).willReturn(Optional.of(user));
+            given(orderRepository.save(any(Order.class))).willReturn(order9000);
+            given(stockHistoryRepository.save(any())).willReturn(null);
+
+            // when
+            orderService.order(req2);
+
+            // then: 10000 - 9000 = 1000
+            assertThat(user.getPoint()).isEqualTo(1000L);
+        }
+    }
+
+    @Test
+    @DisplayName("수량 2개 주문 시 재고 2회 차감")
+    void 주문_수량2_재고_2회_차감() {
+        try (MockedStatic<LocalTime> mockedTime = mockStatic(LocalTime.class, CALLS_REAL_METHODS)) {
+            // given: quantity=2, stock=20
+            mockedTime.when(LocalTime::now).thenReturn(TIME_10AM);
+
+            OrderCreateRequestDto req2 = new OrderCreateRequestDto("010-1234-5678", 1L, 1L, 1L, 2);
+            Order order9000 = Order.builder()
+                    .userId(1L).menuId(1L).storeId(1L).kioskId(1L).totalPrice(9000).build();
+            order9000.complete();
+            ReflectionTestUtils.setField(order9000, "id", 200L);
+
+            given(storeRepository.findById(1L)).willReturn(Optional.of(activeStore));
+            given(specialCloseRepository.findByStoreId(1L)).willReturn(Collections.emptyList());
+            given(menuRepository.findByIdAndIsVisibleTrue(1L)).willReturn(Optional.of(menu));
+            given(menuStockRepository.findByStoreIdAndMenuIdWithLock(1L, 1L)).willReturn(Optional.of(menuStock));
+            given(userService.findOrCreateUser("010-1234-5678")).willReturn(user);
+            given(userRepository.findByIdWithLock(1L)).willReturn(Optional.of(user));
+            given(orderRepository.save(any(Order.class))).willReturn(order9000);
+            given(stockHistoryRepository.save(any())).willReturn(null);
+
+            // when
+            orderService.order(req2);
+
+            // then: 20 - 2 = 18
+            assertThat(menuStock.getStock()).isEqualTo(18);
+        }
+    }
+
+    @Test
+    @DisplayName("수량 2개 주문 시 totalPrice = price * quantity")
+    void 주문_수량2_totalPrice_검증() {
+        try (MockedStatic<LocalTime> mockedTime = mockStatic(LocalTime.class, CALLS_REAL_METHODS)) {
+            // given: quantity=2, price=4500 → totalPrice=9000
+            mockedTime.when(LocalTime::now).thenReturn(TIME_10AM);
+
+            OrderCreateRequestDto req2 = new OrderCreateRequestDto("010-1234-5678", 1L, 1L, 1L, 2);
+            Order order9000 = Order.builder()
+                    .userId(1L).menuId(1L).storeId(1L).kioskId(1L).totalPrice(9000).build();
+            order9000.complete();
+            ReflectionTestUtils.setField(order9000, "id", 200L);
+
+            given(storeRepository.findById(1L)).willReturn(Optional.of(activeStore));
+            given(specialCloseRepository.findByStoreId(1L)).willReturn(Collections.emptyList());
+            given(menuRepository.findByIdAndIsVisibleTrue(1L)).willReturn(Optional.of(menu));
+            given(menuStockRepository.findByStoreIdAndMenuIdWithLock(1L, 1L)).willReturn(Optional.of(menuStock));
+            given(userService.findOrCreateUser("010-1234-5678")).willReturn(user);
+            given(userRepository.findByIdWithLock(1L)).willReturn(Optional.of(user));
+            given(orderRepository.save(any(Order.class))).willReturn(order9000);
+            given(stockHistoryRepository.save(any())).willReturn(null);
+
+            // when
+            OrderCreateResponseDto response = orderService.order(req2);
+
+            // then
+            assertThat(response.totalPrice()).isEqualTo(9000);
+        }
+    }
+
+    @Test
+    @DisplayName("재고보다 많은 수량 주문 - MENU_SOLD_OUT 예외")
+    void 주문_재고초과_수량_예외() {
+        try (MockedStatic<LocalTime> mockedTime = mockStatic(LocalTime.class, CALLS_REAL_METHODS)) {
+            // given: stock=1, quantity=2
+            mockedTime.when(LocalTime::now).thenReturn(TIME_10AM);
+
+            MenuStock oneStock = MenuStock.builder().storeId(1L).menuId(1L).stock(1).build();
+            OrderCreateRequestDto req2 = new OrderCreateRequestDto("010-1234-5678", 1L, 1L, 1L, 2);
+
+            User richUser = User.builder().phoneNumber("010-1234-5678").point(50000L).build();
+            ReflectionTestUtils.setField(richUser, "id", 1L);
+
+            given(storeRepository.findById(1L)).willReturn(Optional.of(activeStore));
+            given(specialCloseRepository.findByStoreId(1L)).willReturn(Collections.emptyList());
+            given(menuRepository.findByIdAndIsVisibleTrue(1L)).willReturn(Optional.of(menu));
+            given(menuStockRepository.findByStoreIdAndMenuIdWithLock(1L, 1L)).willReturn(Optional.of(oneStock));
+            given(userService.findOrCreateUser("010-1234-5678")).willReturn(richUser);
+            given(userRepository.findByIdWithLock(1L)).willReturn(Optional.of(richUser));
+
+            // when & then
+            assertThatThrownBy(() -> orderService.order(req2))
+                    .isInstanceOf(BusinessException.class)
+                    .extracting("errorCode")
+                    .isEqualTo(ErrorCode.MENU_SOLD_OUT);
+        }
     }
 }

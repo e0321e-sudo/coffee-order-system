@@ -33,7 +33,10 @@ public enum ErrorCode {
     SPECIAL_CLOSE_NOT_FOUND(HttpStatus.NOT_FOUND, "특별 휴무를 찾을 수 없습니다."),
     DUPLICATE_SPECIAL_CLOSE(HttpStatus.BAD_REQUEST, "이미 등록된 특별 휴무일입니다."),
 
-    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "인증이 필요합니다.");
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "인증이 필요합니다."),
+
+    CART_EMPTY(HttpStatus.BAD_REQUEST, "장바구니가 비어있습니다."),
+    CART_ITEM_NOT_FOUND(HttpStatus.BAD_REQUEST, "장바구니에 없는 메뉴입니다.");
 
     private final HttpStatus status;
     private final String message;
