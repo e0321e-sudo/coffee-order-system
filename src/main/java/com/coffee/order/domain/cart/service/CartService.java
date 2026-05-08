@@ -131,7 +131,7 @@ public class CartService {
 
             // 기존 OrderService 재사용 — quantity 포함해서 주문
             OrderCreateRequestDto orderRequest = new OrderCreateRequestDto(
-                    request.getPhoneNumber(), menuId, request.getStoreId(), request.getKioskId(), quantity
+                    request.getPhoneNumber(), menuId, request.getStoreId(), request.getKioskId(), quantity, null
             );
             OrderCreateResponseDto response = orderService.order(orderRequest);
             orderIds.add(response.orderId());
