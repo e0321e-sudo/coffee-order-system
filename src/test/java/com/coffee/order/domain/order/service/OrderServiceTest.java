@@ -13,6 +13,7 @@ import com.coffee.order.domain.order.entity.Order;
 import com.coffee.order.domain.order.entity.OrderStatus;
 import com.coffee.order.domain.order.kafka.OrderProducer;
 import com.coffee.order.domain.order.repository.OrderRepository;
+import com.coffee.order.common.service.IdempotencyService;
 import com.coffee.order.domain.stock.kafka.StockProducer;
 import com.coffee.order.domain.stock.repository.StockHistoryRepository;
 import com.coffee.order.domain.store.entity.SpecialClose;
@@ -67,6 +68,7 @@ class OrderServiceTest {
     @Mock private StockHistoryRepository stockHistoryRepository;
     @Mock private OrderProducer orderProducer;
     @Mock private StockProducer stockProducer;
+    @Mock private IdempotencyService idempotencyService;
 
     private OrderCreateRequestDto request;
     private Store activeStore;
@@ -77,7 +79,7 @@ class OrderServiceTest {
 
     @BeforeEach
     void setUp() {
-        request = new OrderCreateRequestDto("010-1234-5678", 1L, 1L, 1L, 1);
+        request = new OrderCreateRequestDto("010-1234-5678", 1L, 1L, 1L, 1, null);
 
         activeStore = Store.builder()
                 .name("테스트 커피 매장")
@@ -856,7 +858,7 @@ class OrderServiceTest {
             // given: quantity=2, price=4500 → 9000 차감
             mockedTime.when(LocalTime::now).thenReturn(TIME_10AM);
 
-            OrderCreateRequestDto req2 = new OrderCreateRequestDto("010-1234-5678", 1L, 1L, 1L, 2);
+            OrderCreateRequestDto req2 = new OrderCreateRequestDto("010-1234-5678", 1L, 1L, 1L, 2, null);
             Order order9000 = Order.builder()
                     .userId(1L).menuId(1L).storeId(1L).kioskId(1L).totalPrice(9000).build();
             order9000.complete();
@@ -886,7 +888,7 @@ class OrderServiceTest {
             // given: quantity=2, stock=20
             mockedTime.when(LocalTime::now).thenReturn(TIME_10AM);
 
-            OrderCreateRequestDto req2 = new OrderCreateRequestDto("010-1234-5678", 1L, 1L, 1L, 2);
+            OrderCreateRequestDto req2 = new OrderCreateRequestDto("010-1234-5678", 1L, 1L, 1L, 2, null);
             Order order9000 = Order.builder()
                     .userId(1L).menuId(1L).storeId(1L).kioskId(1L).totalPrice(9000).build();
             order9000.complete();
@@ -916,7 +918,7 @@ class OrderServiceTest {
             // given: quantity=2, price=4500 → totalPrice=9000
             mockedTime.when(LocalTime::now).thenReturn(TIME_10AM);
 
-            OrderCreateRequestDto req2 = new OrderCreateRequestDto("010-1234-5678", 1L, 1L, 1L, 2);
+            OrderCreateRequestDto req2 = new OrderCreateRequestDto("010-1234-5678", 1L, 1L, 1L, 2, null);
             Order order9000 = Order.builder()
                     .userId(1L).menuId(1L).storeId(1L).kioskId(1L).totalPrice(9000).build();
             order9000.complete();
@@ -947,7 +949,7 @@ class OrderServiceTest {
             mockedTime.when(LocalTime::now).thenReturn(TIME_10AM);
 
             MenuStock oneStock = MenuStock.builder().storeId(1L).menuId(1L).stock(1).build();
-            OrderCreateRequestDto req2 = new OrderCreateRequestDto("010-1234-5678", 1L, 1L, 1L, 2);
+            OrderCreateRequestDto req2 = new OrderCreateRequestDto("010-1234-5678", 1L, 1L, 1L, 2, null);
 
             User richUser = User.builder().phoneNumber("010-1234-5678").point(50000L).build();
             ReflectionTestUtils.setField(richUser, "id", 1L);

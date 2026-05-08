@@ -11,13 +11,9 @@ spring:
     hibernate:
       ddl-auto: create
     show-sql: true
-    defer-datasource-initialization: true
     properties:
       hibernate:
         format_sql: true
-  sql:
-    init:
-      mode: always
   data:
     redis:
       host: localhost
