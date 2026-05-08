@@ -1,4 +1,16 @@
 package com.coffee.order.domain.menu.dto.response;
 
-public record PopularMenuResponseDto(Long menuId, String name, int price, String categoryName, long orderCount) {
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+public class PopularMenuResponseDto {
+    private Long menuId;
+    private String name;
+    private int price;
+    private String categoryName;
+    private Long orderCount;
 }
