@@ -2,6 +2,7 @@ package com.coffee.order.domain.order.service;
 
 import com.coffee.order.common.exception.BusinessException;
 import com.coffee.order.common.exception.ErrorCode;
+import com.coffee.order.common.service.IdempotencyService;
 import com.coffee.order.domain.menu.entity.Menu;
 import com.coffee.order.domain.menu.entity.MenuStock;
 import com.coffee.order.domain.menu.repository.MenuRepository;
@@ -50,9 +51,15 @@ public class OrderService {
     private final StockHistoryRepository stockHistoryRepository;
     private final OrderProducer orderProducer;
     private final StockProducer stockProducer;
+    private final IdempotencyService idempotencyService;
 
     @Transactional
     public OrderCreateResponseDto order(OrderCreateRequestDto request) {
+
+        // 중복 주문 방지 - 같은 Idempotency-Key로 5분 내 재요청 시 차단
+        if (request.getIdempotencyKey() != null) {
+            idempotencyService.checkAndSave(request.getIdempotencyKey(), "order");
+        }
         // 1. 영업시간 체크
         LocalTime now = LocalTime.now();
         if (now.isBefore(OPEN_TIME) || now.isAfter(CLOSE_TIME)) {

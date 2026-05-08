@@ -28,4 +28,7 @@ public class OrderCreateRequestDto {
 
     @Min(1)
     private int quantity = 1;
+
+    // 중복 요청 방지 키 (선택값 - 없으면 검사 안 함)
+    private String idempotencyKey;
 }

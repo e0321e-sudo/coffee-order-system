@@ -32,6 +32,7 @@ public enum ErrorCode {
     STOCK_NOT_FOUND(HttpStatus.NOT_FOUND, "재고를 찾을 수 없습니다."),
     SPECIAL_CLOSE_NOT_FOUND(HttpStatus.NOT_FOUND, "특별 휴무를 찾을 수 없습니다."),
     DUPLICATE_SPECIAL_CLOSE(HttpStatus.BAD_REQUEST, "이미 등록된 특별 휴무일입니다."),
+    DUPLICATE_REQUEST(HttpStatus.CONFLICT, "중복 요청입니다. 잠시 후 다시 시도해주세요."),
 
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "인증이 필요합니다."),
 

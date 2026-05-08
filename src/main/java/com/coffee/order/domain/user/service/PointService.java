@@ -2,6 +2,7 @@ package com.coffee.order.domain.user.service;
 
 import com.coffee.order.common.exception.BusinessException;
 import com.coffee.order.common.exception.ErrorCode;
+import com.coffee.order.common.service.IdempotencyService;
 import com.coffee.order.domain.user.dto.request.PointChargeRequestDto;
 import com.coffee.order.domain.user.dto.response.PointChargeResponseDto;
 import com.coffee.order.domain.user.entity.User;
@@ -15,9 +16,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class PointService {
 
     private final UserRepository userRepository;
+    private final IdempotencyService idempotencyService;
 
     @Transactional
     public PointChargeResponseDto charge(PointChargeRequestDto request) {
+
+        // 중복 충전 방지 - 같은 Idempotency-Key로 5분 내 재요청 시 차단
+        if (request.getIdempotencyKey() != null) {
+            idempotencyService.checkAndSave(request.getIdempotencyKey(), "point");
+        }
         User user = userRepository.findByPhoneNumber(request.getPhoneNumber())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
