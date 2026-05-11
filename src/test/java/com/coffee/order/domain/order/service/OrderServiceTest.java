@@ -39,6 +39,9 @@ import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
@@ -967,5 +970,41 @@ class OrderServiceTest {
                     .extracting("errorCode")
                     .isEqualTo(ErrorCode.MENU_SOLD_OUT);
         }
+    }
+
+    @Test
+    @DisplayName("동시에 100건의 주문이 들어와도 비관적 락을 통해 재고가 정확하게 차감되어야 한다")
+    void concurrency_order_test() throws InterruptedException {
+        // 재고 100개, 포인트 500,000
+        ReflectionTestUtils.setField(menuStock, "stock", 100);
+        ReflectionTestUtils.setField(user, "point", 500000L);
+
+        int threadCount = 100;
+        ExecutorService executorService = Executors.newFixedThreadPool(32);
+        CountDownLatch latch = new CountDownLatch(threadCount);
+
+        // Mock 설정
+        given(storeRepository.findById(any())).willReturn(Optional.of(activeStore));
+        given(menuRepository.findByIdAndIsVisibleTrue(any())).willReturn(Optional.of(menu));
+        given(menuStockRepository.findByStoreIdAndMenuIdWithLock(any(), any())).willReturn(Optional.of(menuStock));
+        given(userService.findOrCreateUser(any())).willReturn(user);
+        given(userRepository.findByIdWithLock(any())).willReturn(Optional.of(user));
+        given(orderRepository.save(any())).willReturn(savedOrder);
+
+        for (int i = 0; i < threadCount; i++) {
+            executorService.submit(() -> {
+                try {
+                    orderService.order(request);
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+
+        latch.await();
+
+        // 검증
+        System.out.println("최종 남은 재고: " + menuStock.getStock());
+        assertThat(menuStock.getStock()).isEqualTo(0);
     }
 }
