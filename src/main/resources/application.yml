@@ -7,6 +7,7 @@ spring:
     url: jdbc:mysql://localhost:3307/coffee_order_db?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
+
     hikari:
       maximum-pool-size: 50
       connection-timeout: 30000
@@ -14,7 +15,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
