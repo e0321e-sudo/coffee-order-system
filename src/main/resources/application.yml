@@ -7,6 +7,10 @@ spring:
     url: jdbc:mysql://localhost:3307/coffee_order_db?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
+    hikari:
+      maximum-pool-size: 50
+      connection-timeout: 30000
+      minimum-idle: 10
   jpa:
     hibernate:
       ddl-auto: create
@@ -14,6 +18,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        default_batch_fetch_size: 100
   data:
     redis:
       host: localhost

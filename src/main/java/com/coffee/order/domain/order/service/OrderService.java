@@ -56,38 +56,41 @@ public class OrderService {
     @Transactional
     public OrderCreateResponseDto order(OrderCreateRequestDto request) {
 
-        // 중복 주문 방지 - 같은 Idempotency-Key로 5분 내 재요청 시 차단
+        // 1. 중복 주문 방지 (멱등성)
         if (request.getIdempotencyKey() != null) {
             idempotencyService.checkAndSave(request.getIdempotencyKey(), "order");
         }
-        // 1. 영업시간 체크
+
+        // 2. 영업시간 및 매장 상태 체크
         LocalTime now = LocalTime.now();
         if (now.isBefore(OPEN_TIME) || now.isAfter(CLOSE_TIME)) {
             throw new BusinessException(ErrorCode.OUT_OF_BUSINESS_HOURS);
         }
 
-        // 2. 임시휴무 체크
         Store store = storeRepository.findById(request.getStoreId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.STORE_CLOSED));
         List<SpecialClose> specialCloses = specialCloseRepository.findByStoreId(request.getStoreId());
         store.validateOpen(LocalDate.now(), specialCloses);
 
-        // 3. 메뉴 조회 및 품절 체크
+        // 3. 메뉴 및 재고 조회 (비관적 락 가동)
         Menu menu = menuRepository.findByIdAndIsVisibleTrue(request.getMenuId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.MENU_NOT_FOUND));
+
         MenuStock menuStock = menuStockRepository
                 .findByStoreIdAndMenuIdWithLock(request.getStoreId(), request.getMenuId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.MENU_SOLD_OUT));
+
         menuStock.validateNotSoldOut();
 
-        // 4. 비관적 락으로 포인트 차감
+        // 4. 유저 조회 및 포인트 차감 (비관적 락 가동)
         int quantity = request.getQuantity();
         User user = userService.findOrCreateUser(request.getPhoneNumber());
         User lockedUser = userRepository.findByIdWithLock(user.getId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
         lockedUser.deductPoint((long) menu.getPrice() * quantity);
 
-        // 5. 재고 차감
+        // 5. 재고 차감 및 이력 준비
         if (menuStock.getStock() < quantity) {
             throw new BusinessException(ErrorCode.MENU_SOLD_OUT);
         }
@@ -96,23 +99,11 @@ public class OrderService {
             menuStock.decreaseStock();
         }
 
-        // 재고 10개 이하 감지 시 stock-alert 발행
-        if (menuStock.getStock() <= MenuStock.LOW_STOCK_THRESHOLD) {
-            stockProducer.sendStockAlert(new StockAlertEvent(
-                    request.getStoreId(),
-                    store.getName(),
-                    menu.getId(),
-                    menu.getName(),
-                    menuStock.getStock()
-            ));
-        }
-
-        // 6. 주문 생성 (COMPLETED)
+        // 6. 주문 생성 및 저장
         Order savedOrder = orderRepository.save(
                 buildCompletedOrder(lockedUser.getId(), menu, request)
         );
 
-        // 7. 재고 변동 이력 기록
         stockHistoryRepository.save(StockHistory.builder()
                 .menuId(menu.getId())
                 .storeId(request.getStoreId())
@@ -120,20 +111,29 @@ public class OrderService {
                 .changedAmount(quantity)
                 .stockBefore(stockBefore)
                 .stockAfter(menuStock.getStock())
-                .adminId(null)
                 .build());
 
-        // 8. Kafka 주문 완료 이벤트 발행
-        orderProducer.sendOrderCompleted(new OrderCompletedEvent(
-                savedOrder.getId(),
-                lockedUser.getId(),
-                lockedUser.getPhoneNumber(),
-                menu.getId(),
-                request.getStoreId(),
-                request.getKioskId(),
-                savedOrder.getTotalPrice(),
-                savedOrder.getCreatedAt()
-        ));
+        // 7. 사후 처리 로직 분리
+        // DB 커밋이 완료된 '후'에만 카프카를 쏘도록 등록
+        org.springframework.transaction.support.TransactionSynchronizationManager.registerSynchronization(
+                new org.springframework.transaction.support.TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        // 재고 부족 알림 발행
+                        if (menuStock.getStock() <= MenuStock.LOW_STOCK_THRESHOLD) {
+                            stockProducer.sendStockAlert(new StockAlertEvent(
+                                    request.getStoreId(), store.getName(), menu.getId(), menu.getName(), menuStock.getStock()
+                            ));
+                        }
+                        // 주문 완료 이벤트 발행
+                        orderProducer.sendOrderCompleted(new OrderCompletedEvent(
+                                savedOrder.getId(), lockedUser.getId(), lockedUser.getPhoneNumber(),
+                                menu.getId(), request.getStoreId(), request.getKioskId(),
+                                savedOrder.getTotalPrice(), savedOrder.getCreatedAt()
+                        ));
+                    }
+                }
+        );
 
         return OrderCreateResponseDto.of(savedOrder, menu.getName(), lockedUser.getPoint());
     }

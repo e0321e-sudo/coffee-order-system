@@ -17,6 +17,7 @@ public class PointService {
 
     private final UserRepository userRepository;
     private final IdempotencyService idempotencyService;
+    private final UserService userService;
 
     @Transactional
     public PointChargeResponseDto charge(PointChargeRequestDto request) {
@@ -25,8 +26,8 @@ public class PointService {
         if (request.getIdempotencyKey() != null) {
             idempotencyService.checkAndSave(request.getIdempotencyKey(), "point");
         }
-        User user = userRepository.findByPhoneNumber(request.getPhoneNumber())
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        User user = userService.findOrCreateUser(request.getPhoneNumber());
 
         // 비관적 락으로 동시 충전 직렬화
         User lockedUser = userRepository.findByIdWithLock(user.getId())

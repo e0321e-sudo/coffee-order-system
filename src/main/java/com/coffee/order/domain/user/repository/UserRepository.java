@@ -13,7 +13,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByPhoneNumber(String phoneNumber);
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    // @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT u FROM User u WHERE u.id = :id")
     Optional<User> findByIdWithLock(@Param("id") Long id);
 }
