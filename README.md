@@ -410,26 +410,15 @@ GET /api/menus/popular 요청
 
 ## 🧪 테스트
 
-### 테스트 현황
+### ✅ 전체 테스트 통과 (176 Tests Passed)
+- 비즈니스 로직, 경계값 검증, 예외 상황 등 총 176개의 테스트 케이스를 구축하여 시스템 안정성을 확보했습니다.
 
 ![img_2.png](img_2.png)
 
-| 테스트 클래스 | 테스트 수     | 주요 내용 |
-|-------------|-----------|---------|
-| OrderServiceTest | 26개       | 영업시간, 임시휴무, 메뉴/재고/포인트 경계값, 취소 5분 경계값 |
-| MenuStockTest | 13개       | 품절 검증, 차감/증가, 경계값, 동시성 |
-| UserTest | 8개        | 충전/차감 성공·실패, 경계값, 동시성 |
-| AdminServiceTest | 12개       | login/refresh/logout 성공·실패 |
-| OrderTest | 10개       | 상태 전이, validateCancelable 경계값 |
-| KioskAuthInterceptorTest | 7개        | UUID/SecretKey 헤더 누락·불일치 |
-| MenuAdminServiceTest | 16개       | CRUD, 재고 추가, Kafka 이벤트 |
-| StoreServiceTest | 13개       | CRUD 성공·실패 |
-| KioskAdminServiceTest | 13개       | 등록, UUID 고유성, 삭제 |
-| IdempotencyServiceTest | -         | 중복 요청 감지, 타입별 독립성 |
-| MenuServiceTest | -         | 캐시 히트/미스, 캐시 삭제 |
-| CartServiceTest | -         | 장바구니 담기/조회/삭제/결제 |
-| PopularMenuSchedulerTest | -         | 스케줄러 동작 |
-| **합계** | **176개+** | |
+### 🚀 동시성 테스트 (Concurrency Test)
+- **ExecutorService**와 **CountDownLatch**를 활용하여 100건의 주문이 동시에 발생하는 상황을 검증했습니다.
+- **비관적 락(Pessimistic Lock)**을 통해 데이터 정합성을 보장하며, 대용량 트래픽 상황에서도 재고 오차 없이 1초(1s) 만에 처리를 완료했습니다.
+![img_3.png](img_3.png)
 
 ### 테스트 실행 환경
 
